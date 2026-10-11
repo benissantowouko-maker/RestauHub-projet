@@ -8,6 +8,16 @@
     <title>@yield('title', 'Café Paris Lomé — Brasserie Gourmande & Commande en Ligne')</title>
     <meta name="description" content="Café Paris à Lomé (Togo) : cuisine raffinée, pizzas au feu de bois, grillades et spécialités locales. Commandez en ligne, paiement Flooz, T-Money ou espèces à la livraison.">
 
+    {{-- PWA --}}
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="RestauHub">
+    <meta name="theme-color" content="#7F1D1D">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+
     <!-- Fonts: Instrument Sans & Playfair Display -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -553,8 +563,56 @@
             if (window.lucide) {
                 lucide.createIcons();
             }
+
+            // Register PWA Service Worker
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            }
+
+            // PWA Install Prompt — show a subtle banner
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                const banner = document.getElementById('pwa-banner');
+                if (banner) banner.classList.remove('hidden');
+
+                document.getElementById('pwa-install-btn')?.addEventListener('click', () => {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then(() => {
+                        if (banner) banner.classList.add('hidden');
+                        deferredPrompt = null;
+                    });
+                });
+                document.getElementById('pwa-dismiss-btn')?.addEventListener('click', () => {
+                    if (banner) banner.classList.add('hidden');
+                    sessionStorage.setItem('pwa-dismissed', '1');
+                });
+            });
         });
     </script>
+
+    {{-- PWA Install Banner (shown only when browser triggers beforeinstallprompt) --}}
+    <div id="pwa-banner"
+         class="hidden fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-50
+                w-[calc(100%-2rem)] max-w-sm
+                bg-red-950 border border-red-800/60 text-white rounded-2xl shadow-2xl
+                flex items-center gap-3 px-4 py-3.5">
+        <div class="shrink-0 w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
+            <i data-lucide="smartphone" class="w-5 h-5 text-amber-400"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold leading-tight">Installer RestauHub</p>
+            <p class="text-xs text-red-300 truncate">Commandez depuis votre écran d'accueil</p>
+        </div>
+        <button id="pwa-install-btn"
+                class="shrink-0 px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold rounded-lg transition">
+            Installer
+        </button>
+        <button id="pwa-dismiss-btn" class="shrink-0 text-red-400 hover:text-white transition">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+    </div>
 
     @stack('scripts')
 </body>

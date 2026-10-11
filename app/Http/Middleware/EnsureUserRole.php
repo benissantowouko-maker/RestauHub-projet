@@ -11,20 +11,34 @@ class EnsureUserRole
 {
     /**
      * Handle an incoming request.
+     * Staff roles (admin, staff, livreur) are redirected to /pro when not authenticated.
+     * Clients are redirected to /connexion.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
         if (! Auth::check()) {
-            return redirect()->route('login')->with('warning', 'Veuillez vous connecter pour accéder à cet espace.');
+            // Staff areas require the internal portal
+            $staffRoles   = ['admin', 'staff', 'livreur'];
+            $requiresStaff = ! empty(array_intersect($roles, $staffRoles));
+
+            if ($requiresStaff) {
+                return redirect()->route('staff.login')
+                    ->with('warning', 'Veuillez vous connecter pour accéder à cet espace.');
+            }
+
+            return redirect()->route('login')
+                ->with('warning', 'Veuillez vous connecter pour accéder à cet espace.');
         }
 
         $user = Auth::user();
 
         if (! $user->actif) {
             Auth::logout();
-            return redirect()->route('login')->with('error', 'Votre compte a été désactivé par l’administrateur.');
+
+            return redirect()->route('staff.login')
+                ->with('error', 'Votre compte a été désactivé. Contactez l\'administrateur.');
         }
 
         if (empty($roles)) {
@@ -35,6 +49,6 @@ class EnsureUserRole
             return $next($request);
         }
 
-        abort(403, 'Accès non autorisé à cette section (Rôle requis: ' . implode(', ', $roles) . ').');
+        abort(403, 'Accès non autorisé à cette section (Rôle requis : '.implode(', ', $roles).').');
     }
 }

@@ -1,0 +1,38 @@
+{
+  "name": "RestauHub — Café Paris Lomé",
+  "short_name": "RestauHub",
+  "description": "Commandez en ligne, suivez votre livraison en temps réel. Café Paris Lomé, Togo.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FAF7F2",
+  "theme_color": "#7F1D1D",
+  "orientation": "portrait",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["food", "shopping"],
+  "shortcuts": [
+    {
+      "name": "Commander",
+      "short_name": "Commander",
+      "description": "Voir le menu et commander",
+      "url": "/menu",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Réserver une table",
+      "short_name": "Réserver",
+      "description": "Réserver une table en ligne",
+      "url": "/reserver",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "any" }]
+    }
+  ],
+  "prefer_related_applications": false
+}

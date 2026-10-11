@@ -1,0 +1,21 @@
+{
+  "name": "RestauHub Staff",
+  "short_name": "RH Staff",
+  "description": "Espace interne RestauHub — Livreurs, Cuisine, Administration",
+  "start_url": "/pro",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0F172A",
+  "theme_color": "#4F46E5",
+  "orientation": "portrait-primary",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/icons/icon-staff.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "prefer_related_applications": false
+}

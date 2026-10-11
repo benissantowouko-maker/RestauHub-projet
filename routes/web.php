@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\RevenueController as AdminRevenueController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\StaffAuthController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InvoiceController;
@@ -64,6 +65,19 @@ Route::post('/deconnexion', [AuthController::class, 'logout'])->name('logout');
 Route::middleware('auth')->group(function () {
     Route::get('/compte', [AuthController::class, 'profile'])->name('compte.commandes');
 });
+
+// Offline fallback page (referenced by service worker)
+Route::get('/offline', fn () => view('pages.offline'))->name('offline');
+
+/*
+|--------------------------------------------------------------------------
+| Portail Interne Staff — URL volontairement discrète, non liée dans le site
+| /pro = admin, cuisine, livreur — les clients NE peuvent PAS se connecter ici
+|--------------------------------------------------------------------------
+*/
+Route::get('/pro', [StaffAuthController::class, 'showLogin'])->name('staff.login');
+Route::post('/pro', [StaffAuthController::class, 'login'])->name('staff.login.post');
+Route::post('/pro/deconnexion', [StaffAuthController::class, 'logout'])->name('staff.logout');
 
 /*
 |--------------------------------------------------------------------------

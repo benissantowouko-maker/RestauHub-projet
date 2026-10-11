@@ -2,8 +2,17 @@
 <html lang="fr" class="h-full bg-slate-900">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    {{-- PWA Staff --}}
+    <link rel="manifest" href="/manifest-staff.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RH Livreur">
+    <meta name="theme-color" content="#4F46E5">
+    <link rel="apple-touch-icon" href="/icons/icon-staff-192.png">
 
     <title>@yield('title', 'Espace Coursier') — Café Paris Lomé</title>
 
@@ -138,8 +147,44 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             if (window.lucide) lucide.createIcons();
+
+            // Register Service Worker for offline/PWA
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            }
+
+            // PWA Install prompt
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                const banner = document.getElementById('pwa-install-banner');
+                if (banner) banner.classList.remove('hidden');
+                document.getElementById('pwa-install-btn')?.addEventListener('click', () => {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then(() => {
+                        if (banner) banner.classList.add('hidden');
+                    });
+                });
+            });
         });
     </script>
     @stack('scripts')
+
+    {{-- PWA Install Banner for staff/livreur --}}
+    <div id="pwa-install-banner"
+         class="hidden fixed top-20 inset-x-4 z-50
+                bg-indigo-900 border border-indigo-700/60 text-white rounded-2xl shadow-2xl
+                flex items-center gap-3 px-4 py-3">
+        <i data-lucide="smartphone" class="w-5 h-5 text-indigo-300 shrink-0"></i>
+        <div class="flex-1 min-w-0">
+            <p class="text-xs font-bold">Installer l'app livreur</p>
+            <p class="text-[11px] text-indigo-300">Accès rapide depuis l'écran d'accueil</p>
+        </div>
+        <button id="pwa-install-btn"
+                class="shrink-0 px-3 py-1.5 bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-bold rounded-lg transition">
+            Installer
+        </button>
+    </div>
 </body>
 </html>
